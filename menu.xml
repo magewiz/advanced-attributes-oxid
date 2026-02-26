@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<OX>
+    <OXMENU id="NAVIGATION_ESHOPADMIN">
+        <MAINMENU id="mxmanageprod">
+            <SUBMENU id="mxattributes" cl="attribute">
+                <TAB id="tbclattribute_value" cl="attribute_value" />
+            </SUBMENU>
+        </MAINMENU>
+    </OXMENU>
+</OX>

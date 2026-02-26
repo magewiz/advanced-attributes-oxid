@@ -1,0 +1,110 @@
+{% include "headitem.html.twig" with {title: "GENERAL_ADMIN_TITLE"|translate} %}
+
+<form name="transfer" id="transfer" action="{{ oViewConf.getSelfLink()|raw }}" method="post">
+	{{ oViewConf.getHiddenSid()|raw }}
+	<input type="hidden" name="oxid" value="{{ oxid }}">
+	<input type="hidden" name="cl" value="attribute_value">
+	<input type="hidden" name="editlanguage" value="{{ editlanguage }}">
+</form>
+
+<form name="myedit" id="myedit" action="{{ oViewConf.getSelfLink()|raw }}" method="post" enctype="multipart/form-data">
+	{{ oViewConf.getHiddenSid()|raw }}
+	<input type="hidden" name="cl" value="attribute_value">
+	<input type="hidden" name="fnc" value="">
+	<input type="hidden" name="oxid" value="{{ oxid }}">
+
+	<table cellspacing="0" cellpadding="0" border="0" width="98%">
+		<tr>
+			<td valign="top" class="edittext">
+				{% if edit.getType() in ['SELECT', 'MULTISELECT', 'COLOR', 'IMAGE'] %}
+					<h3>Manage Values for:
+						{{ edit.oxattribute__oxtitle.value }}</h3>
+
+					<table cellspacing="0" cellpadding="0" border="0" width="100%">
+						<tr>
+							<td class="edittext">
+								<b>Sort</b>
+							</td>
+							<td class="edittext">
+								<b>Value</b>
+							</td>
+							<td class="edittext">
+								<b>Color (Hex)</b>
+							</td>
+							<td class="edittext">
+								<b>Image</b>
+							</td>
+							<td class="edittext"></td>
+						</tr>
+						{% for value in attributeValues %}
+							<tr>
+								<td class="edittext">
+									<input type="text" class="editinput" size="5" name="values[{{ value.oxattributevalues__oxid.value }}][oxattributevalues__oxsort]" value="{{ value.oxattributevalues__oxsort.value }}">
+								</td>
+								<td class="edittext">
+									<input type="text" class="editinput" size="30" name="values[{{ value.oxattributevalues__oxid.value }}][oxattributevalues__oxvalue]" value="{{ value.oxattributevalues__oxvalue.value }}">
+								</td>
+								<td class="edittext">
+									<input type="text" class="editinput" size="10" name="values[{{ value.oxattributevalues__oxid.value }}][oxattributevalues__oxcolor]" value="{{ value.oxattributevalues__oxcolor.value }}">
+								</td>
+								<td class="edittext">
+									{% if value.oxattributevalues__oximage.value %}
+										<a href="{{ oViewConf.getShopUrl() }}out/pictures/master/attributes/{{ value.oxattributevalues__oximage.value }}" target="_blank">
+											<img src="{{ oViewConf.getShopUrl() }}out/pictures/master/attributes/{{ value.oxattributevalues__oximage.value }}" style="height: 20px; vertical-align: middle;">
+										</a>
+										<input type="checkbox" name="deleteImage[{{ value.oxattributevalues__oxid.value }}]" value="1"> Del
+									{% endif %}
+									<input type="file" class="editinput" name="image[{{ value.oxattributevalues__oxid.value }}]">
+								</td>
+								<td class="edittext">
+									<a href="#" onclick="document.myedit.fnc.value='delete';document.myedit.action='{{ oViewConf.getSelfLink()|raw }}&valueId={{ value.oxattributevalues__oxid.value }}';document.myedit.submit();">Delete</a>
+								</td>
+							</tr>
+						{% endfor %}
+
+						<!-- Add New -->
+						<tr>
+							<td class="edittext" colspan="5"><hr><b>Add New</b>
+							</td>
+						</tr>
+						<tr>
+							<td class="edittext">
+								<input type="text" class="editinput" size="5" name="newSort" value="" placeholder="Sort">
+							</td>
+							<td class="edittext">
+								<input type="text" class="editinput" size="30" name="newValue" placeholder="New Value">
+							</td>
+							<td class="edittext">
+								<input type="text" class="editinput" size="10" name="newColor" placeholder="#Hex">
+							</td>
+							<td class="edittext">
+								<input type="file" class="editinput" name="newImage">
+							</td>
+							<td class="edittext">
+								<input type="submit" class="edittext" name="save" value="Add" onclick="javascript:document.myedit.fnc.value = (document.getElementsByName('newValue')[0].value) ? 'create' : 'save';">
+							</td>
+						</tr>
+					</table>
+				{% else %}
+					<div class="messagebox">
+
+						{% if edit.getType() == 'TEXT' %}
+							<strong>{{ edit.oxattribute__oxtitle.value }}</strong>
+							is a
+							<strong>Text</strong>
+							attribute.
+																					Predefined values are not used for text attributes.
+						{% else %}
+							This attribute type ({{ edit.getType() }}) does not support managed values.
+																					Change type to Selection, Multiselect or Color to enable value management.
+						{% endif %}
+					</div>
+				{% endif %}
+
+			</td>
+		</tr>
+	</table>
+</form>
+
+{% include "bottomnaviitem.html.twig" %}
+{% include "bottomitem.html.twig" %}
