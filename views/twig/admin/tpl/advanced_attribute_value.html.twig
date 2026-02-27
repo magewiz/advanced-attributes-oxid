@@ -16,24 +16,24 @@
 	<table cellspacing="0" cellpadding="0" border="0" width="98%">
 		<tr>
 			<td valign="top" class="edittext">
-				{% if edit.getType() in ['SELECT', 'MULTISELECT', 'COLOR', 'IMAGE'] %}
-					<h3>Manage Values for:
-						{{ edit.oxattribute__oxtitle.value }}</h3>
+				{% set sType = edit.getType() %}
+				{% set bShowColor = sType in ['COLOR', 'VISUAL_SWATCH'] %}
+				{% set bShowImage = sType in ['IMAGE', 'VISUAL_SWATCH'] %}
+
+				{% if sType in ['SELECT', 'MULTISELECT', 'COLOR', 'IMAGE', 'TEXT_SWATCH', 'VISUAL_SWATCH'] %}
+					<h3>{{ translate({ ident: "ATTR_VALUES_MANAGE" }) }}:
+						{{ edit.oxattribute__oxtitle.value }} ({{ sType }})</h3>
 
 					<table cellspacing="0" cellpadding="0" border="0" width="100%">
 						<tr>
-							<td class="edittext">
-								<b>Sort</b>
-							</td>
-							<td class="edittext">
-								<b>Value</b>
-							</td>
-							<td class="edittext">
-								<b>Color (Hex)</b>
-							</td>
-							<td class="edittext">
-								<b>Image</b>
-							</td>
+							<td class="edittext"><b>{{ translate({ ident: "ATTR_VALUES_SORT" }) }}</b></td>
+							<td class="edittext"><b>{{ translate({ ident: "ATTR_VALUES_VALUE" }) }}</b></td>
+							{% if bShowColor %}
+								<td class="edittext"><b>{{ translate({ ident: "ATTR_VALUES_COLOR" }) }}</b></td>
+							{% endif %}
+							{% if bShowImage %}
+								<td class="edittext"><b>{{ translate({ ident: "ATTR_VALUES_IMAGE" }) }}</b></td>
+							{% endif %}
 							<td class="edittext"></td>
 						</tr>
 						{% for value in attributeValues %}
@@ -44,60 +44,81 @@
 								<td class="edittext">
 									<input type="text" class="editinput" size="30" name="values[{{ value.oxattributevalues__oxid.value }}][oxattributevalues__oxvalue]" value="{{ value.oxattributevalues__oxvalue.value }}">
 								</td>
+								{% if bShowColor %}
+									<td class="edittext">
+										<input type="text" class="editinput" size="10" name="values[{{ value.oxattributevalues__oxid.value }}][oxattributevalues__oxcolor]" value="{{ value.oxattributevalues__oxcolor.value }}" placeholder="#FF0000">
+									</td>
+								{% endif %}
+								{% if bShowImage %}
+									<td class="edittext">
+										{% if value.oxattributevalues__oximage.value %}
+											<a href="{{ oViewConf.getShopUrl() }}out/pictures/master/attributes/{{ value.oxattributevalues__oximage.value }}" target="_blank">
+												<img src="{{ oViewConf.getShopUrl() }}out/pictures/master/attributes/{{ value.oxattributevalues__oximage.value }}" style="height: 20px; vertical-align: middle;">
+											</a>
+											<input type="checkbox" name="deleteImage[{{ value.oxattributevalues__oxid.value }}]" value="1"> Del
+										{% endif %}
+										<input type="file" class="editinput" name="image[{{ value.oxattributevalues__oxid.value }}]">
+									</td>
+								{% endif %}
 								<td class="edittext">
-									<input type="text" class="editinput" size="10" name="values[{{ value.oxattributevalues__oxid.value }}][oxattributevalues__oxcolor]" value="{{ value.oxattributevalues__oxcolor.value }}">
-								</td>
-								<td class="edittext">
-									{% if value.oxattributevalues__oximage.value %}
-										<a href="{{ oViewConf.getShopUrl() }}out/pictures/master/attributes/{{ value.oxattributevalues__oximage.value }}" target="_blank">
-											<img src="{{ oViewConf.getShopUrl() }}out/pictures/master/attributes/{{ value.oxattributevalues__oximage.value }}" style="height: 20px; vertical-align: middle;">
-										</a>
-										<input type="checkbox" name="deleteImage[{{ value.oxattributevalues__oxid.value }}]" value="1"> Del
-									{% endif %}
-									<input type="file" class="editinput" name="image[{{ value.oxattributevalues__oxid.value }}]">
-								</td>
-								<td class="edittext">
-									<a href="#" onclick="document.myedit.fnc.value='delete';document.myedit.action='{{ oViewConf.getSelfLink()|raw }}&valueId={{ value.oxattributevalues__oxid.value }}';document.myedit.submit();">Delete</a>
+									<a href="#" onclick="document.myedit.fnc.value='delete';document.myedit.action='{{ oViewConf.getSelfLink()|raw }}&valueId={{ value.oxattributevalues__oxid.value }}';document.myedit.submit();">{{ translate({ ident: "GENERAL_DELETE" }) }}</a>
 								</td>
 							</tr>
 						{% endfor %}
 
-						<!-- Add New -->
 						<tr>
-							<td class="edittext" colspan="5"><hr><b>Add New</b>
-							</td>
+							<td class="edittext" colspan="5"><hr><b>{{ translate({ ident: "ATTR_VALUES_ADD_NEW" }) }}</b></td>
 						</tr>
 						<tr>
 							<td class="edittext">
-								<input type="text" class="editinput" size="5" name="newSort" value="" placeholder="Sort">
+								<input type="text" class="editinput" size="5" name="newSort" value="" placeholder="{{ translate({ ident: "ATTR_VALUES_SORT" }) }}">
 							</td>
 							<td class="edittext">
-								<input type="text" class="editinput" size="30" name="newValue" placeholder="New Value">
+								<input type="text" class="editinput" size="30" name="newValue" placeholder="{{ translate({ ident: "ATTR_VALUES_NEW_VALUE" }) }}">
 							</td>
+							{% if bShowColor %}
+								<td class="edittext">
+									<input type="text" class="editinput" size="10" name="newColor" placeholder="#FF0000">
+								</td>
+							{% endif %}
+							{% if bShowImage %}
+								<td class="edittext">
+									<input type="file" class="editinput" name="newImage">
+								</td>
+							{% endif %}
 							<td class="edittext">
-								<input type="text" class="editinput" size="10" name="newColor" placeholder="#Hex">
-							</td>
-							<td class="edittext">
-								<input type="file" class="editinput" name="newImage">
-							</td>
-							<td class="edittext">
-								<input type="submit" class="edittext" name="save" value="Add" onclick="javascript:document.myedit.fnc.value = (document.getElementsByName('newValue')[0].value) ? 'create' : 'save';">
+								<input type="submit" class="edittext" name="save" value="{{ translate({ ident: "ATTR_VALUES_ADD" }) }}" onclick="javascript:document.myedit.fnc.value = (document.getElementsByName('newValue')[0].value) ? 'create' : 'save';">
 							</td>
 						</tr>
 					</table>
+
+				{% elseif sType == 'BOOL' %}
+					<div class="messagebox">
+						<strong>{{ edit.oxattribute__oxtitle.value }}</strong>
+						{{ translate({ ident: "ATTR_TYPE_BOOL_INFO" }) }}
+					</div>
+
+				{% elseif sType == 'DATE' or sType == 'DATETIME' %}
+					<div class="messagebox">
+						<strong>{{ edit.oxattribute__oxtitle.value }}</strong>
+						{{ translate({ ident: "ATTR_TYPE_DATE_INFO" }) }}
+					</div>
+
+				{% elseif sType == 'PRICE' %}
+					<div class="messagebox">
+						<strong>{{ edit.oxattribute__oxtitle.value }}</strong>
+						{{ translate({ ident: "ATTR_TYPE_PRICE_INFO" }) }}
+					</div>
+
+				{% elseif sType == 'TEXT' %}
+					<div class="messagebox">
+						<strong>{{ edit.oxattribute__oxtitle.value }}</strong>
+						{{ translate({ ident: "ATTR_TYPE_TEXT_INFO" }) }}
+					</div>
+
 				{% else %}
 					<div class="messagebox">
-
-						{% if edit.getType() == 'TEXT' %}
-							<strong>{{ edit.oxattribute__oxtitle.value }}</strong>
-							is a
-							<strong>Text</strong>
-							attribute.
-																					Predefined values are not used for text attributes.
-						{% else %}
-							This attribute type ({{ edit.getType() }}) does not support managed values.
-																					Change type to Selection, Multiselect or Color to enable value management.
-						{% endif %}
+						{{ translate({ ident: "ATTR_TYPE_UNKNOWN_INFO" }) }} ({{ sType }})
 					</div>
 				{% endif %}
 

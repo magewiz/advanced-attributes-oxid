@@ -5,9 +5,9 @@ $sMetadataVersion = '2.1';
 $aModule = [
     'id' => 'advanced_attributes',
     'title' => 'Advanced Attributes',
-    'description' => 'Extends OXID attribute system with structured types (Color, Date, Boolean, Select).',
+    'description' => 'Extends OXID attribute system with structured types: Text, Selection, Multi-Select, Yes/No, Date, Date & Time, Price, Color, Image, Text Swatch, Visual Swatch.',
     'thumbnail' => '',
-    'version' => '1.0.0',
+    'version' => '1.1.0',
     'author' => 'Antigravity',
     'extend' => [
         \OxidEsales\Eshop\Application\Model\Attribute::class => \Antigravity\AdvancedAttributes\Model\Attribute::class ,
@@ -15,13 +15,6 @@ $aModule = [
         \OxidEsales\Eshop\Application\Model\AttributeList::class => \Antigravity\AdvancedAttributes\Model\AttributeList::class,
         \OxidEsales\Eshop\Application\Controller\Admin\ArticleAttributeAjax::class => \Antigravity\AdvancedAttributes\Controller\Admin\ArticleAttributeAjax::class ,
         \OxidEsales\Eshop\Application\Component\Widget\ArticleDetails::class => \Antigravity\AdvancedAttributes\Component\Widget\ArticleDetails::class ,
-    ],
-    'blocks' => [
-        [
-            'template' => '@__main__/attribute_main.html.twig',
-            'block' => 'admin_attribute_main_form',
-            'file' => '@advanced_attributes/extensions/theme/admin_twig/attribute_main.html.twig',
-        ],
     ],
     'controllers' => [
          'attribute_value' => \Antigravity\AdvancedAttributes\Controller\Admin\AttributeValue::class ,

@@ -2,7 +2,7 @@
     "name": "antigravity/advanced-attributes",
     "description": "Advanced Attributes for OXID eShop",
     "type": "oxideshop-module",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "autoload": {
         "psr-4": {
             "Antigravity\\AdvancedAttributes\\": "./"

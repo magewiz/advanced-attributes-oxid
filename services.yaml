@@ -1,27 +1,3 @@
-parameters:
-    oxid_esales.templating.disable_twig_template_caching: true
-
 services:
-    Antigravity\AdvancedAttributes\Twig\DebugFunctionExtension:
-        tags:
-            - { name: twig.extension }
-
-    Antigravity\AdvancedAttributes\GraphQL\Infrastructure\NamespaceMapper:
-        public: true
-        tags:
-            - { name: graphql_namespace_mapper }
-
-    Antigravity\AdvancedAttributes\GraphQL\Type\AdvancedAttributeType:
-        public: true
-        tags:
-            - { name: graphql_type }
-
-    Antigravity\AdvancedAttributes\GraphQL\Type\AdvancedAttributeValueType:
-        public: true
-        tags:
-            - { name: graphql_type }
-
-    Antigravity\AdvancedAttributes\GraphQL\Controller\AdvancedAttributeController:
-        public: true
-        tags:
-            - { name: graphql_controller }
+    _defaults:
+        autowire: true

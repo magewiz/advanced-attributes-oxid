@@ -9,6 +9,35 @@ use OxidEsales\Eshop\Application\Model\Attribute as AttributionModel;
  */
 class Attribute extends AttributionModel
 {
+    const TYPE_TEXT = 'TEXT';
+    const TYPE_SELECT = 'SELECT';
+    const TYPE_MULTISELECT = 'MULTISELECT';
+    const TYPE_BOOL = 'BOOL';
+    const TYPE_DATE = 'DATE';
+    const TYPE_DATETIME = 'DATETIME';
+    const TYPE_PRICE = 'PRICE';
+    const TYPE_COLOR = 'COLOR';
+    const TYPE_IMAGE = 'IMAGE';
+    const TYPE_TEXT_SWATCH = 'TEXT_SWATCH';
+    const TYPE_VISUAL_SWATCH = 'VISUAL_SWATCH';
+
+    const TYPES_WITH_VALUES = [
+        self::TYPE_SELECT,
+        self::TYPE_MULTISELECT,
+        self::TYPE_COLOR,
+        self::TYPE_IMAGE,
+        self::TYPE_TEXT_SWATCH,
+        self::TYPE_VISUAL_SWATCH,
+    ];
+
+    /**
+     * @return bool
+     */
+    public function hasStructuredValues(): bool
+    {
+        return in_array($this->getType(), self::TYPES_WITH_VALUES);
+    }
+
     /**
      * Get attribute type
      *

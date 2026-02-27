@@ -5,6 +5,7 @@ namespace Antigravity\AdvancedAttributes\Controller\Admin;
 use OxidEsales\Eshop\Application\Controller\Admin\AdminDetailsController;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\Request;
+use OxidEsales\Eshop\Core\Field;
 
 /**
  * Admin controller for managing attribute values.
@@ -57,7 +58,12 @@ class AttributeValue extends AdminDetailsController
                     $oVal = oxNew(\Antigravity\AdvancedAttributes\Model\AttributeValue::class);
                     if ($oVal->load($sValueId)) {
                         $sOldValue = $oVal->oxattributevalues__oxvalue->value;
-                        
+
+                        // Validate color if provided
+                        if (isset($aFields['oxattributevalues__oxcolor']) && !$this->_isValidColor($aFields['oxattributevalues__oxcolor'])) {
+                            $aFields['oxattributevalues__oxcolor'] = $oVal->oxattributevalues__oxcolor->value;
+                        }
+
                         // Assign new values
                         $oVal->assign($aFields);
                         
@@ -148,26 +154,35 @@ class AttributeValue extends AdminDetailsController
         $sNewColor = Registry::getRequest()->getRequestEscapedParameter("newColor");
 
         if ($sOxId && $sNewValue) {
-            $sObjId = \OxidEsales\Eshop\Core\Registry::getUtilsObject()->generateUid();
-            $aLangs = \OxidEsales\Eshop\Core\Registry::getLang()->getLanguageNames();
-            
+            // Validate color
+            if ($sNewColor && !$this->_isValidColor($sNewColor)) {
+                $sNewColor = '';
+            }
+
+            $sObjId = Registry::getUtilsObject()->generateUid();
+            $aLangs = Registry::getLang()->getLanguageNames();
+
             // Handle Image Upload for Creation
             $sImage = $this->_handleUpload('newImage');
 
             foreach ($aLangs as $iLang => $sLangName) {
                 $oVal = oxNew(\Antigravity\AdvancedAttributes\Model\AttributeValue::class);
-                $oVal->oxattributevalues__oxobjid = new \OxidEsales\Eshop\Core\Field($sObjId);
-                $oVal->oxattributevalues__oxattrid = new \OxidEsales\Eshop\Core\Field($sOxId);
-                $oVal->oxattributevalues__oxvalue = new \OxidEsales\Eshop\Core\Field($sNewValue);
-                $oVal->oxattributevalues__oxlang = new \OxidEsales\Eshop\Core\Field($iLang);
-                
-                $oVal->oxattributevalues__oxsort = new \OxidEsales\Eshop\Core\Field((int)$sNewSort);
-                $oVal->oxattributevalues__oxcolor = new \OxidEsales\Eshop\Core\Field($sNewColor);
+                $oVal->oxattributevalues__oxobjid = new Field($sObjId);
+                $oVal->oxattributevalues__oxattrid = new Field($sOxId);
+                $oVal->oxattributevalues__oxvalue = new Field($sNewValue);
+                $oVal->oxattributevalues__oxlang = new Field($iLang);
+                $oVal->oxattributevalues__oxsort = new Field((int) $sNewSort);
+                $oVal->oxattributevalues__oxcolor = new Field($sNewColor);
                 if ($sImage) {
-                    $oVal->oxattributevalues__oximage = new \OxidEsales\Eshop\Core\Field($sImage);
+                    $oVal->oxattributevalues__oximage = new Field($sImage);
                 }
 
                 $oVal->save();
+            }
+
+            // Translation warning for multi-language shops
+            if (count($aLangs) > 1) {
+                $this->_aViewData['translationWarning'] = true;
             }
         }
     }
@@ -188,6 +203,9 @@ class AttributeValue extends AdminDetailsController
         $iError = ($sKey !== null) ? ($aFile['error'][$sKey] ?? 4) : ($aFile['error'] ?? 4);
 
         if ($sName && $iError === 0 && is_uploaded_file($sTmpName)) {
+            if (!$this->_isValidImageType($sName)) {
+                return null;
+            }
             $sDir = Registry::getConfig()->getPictureDir(false) . 'master/attributes/';
             if (!is_dir($sDir)) {
                 mkdir($sDir, 0777, true);
@@ -205,6 +223,30 @@ class AttributeValue extends AdminDetailsController
             }
         }
         return null;
+    }
+
+    /**
+     * Validates hex color format.
+     *
+     * @param string $sColor
+     * @return bool
+     */
+    protected function _isValidColor(string $sColor): bool
+    {
+        return empty($sColor) || (bool) preg_match('/^#[0-9A-Fa-f]{3,8}$/', $sColor);
+    }
+
+    /**
+     * Validates image file extension.
+     *
+     * @param string $sFilename
+     * @return bool
+     */
+    protected function _isValidImageType(string $sFilename): bool
+    {
+        $aAllowed = ['jpg', 'jpeg', 'png', 'gif', 'svg', 'webp'];
+        $sExt = strtolower(pathinfo($sFilename, PATHINFO_EXTENSION));
+        return in_array($sExt, $aAllowed);
     }
 
     /**

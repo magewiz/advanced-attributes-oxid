@@ -3,44 +3,60 @@
         <dt id="attrTitle_{{ loop.index }}">{{ oAttr.title }}</dt>
         <dd id="attrValue_{{ loop.index }}">
             {% set sType = oAttr.oxattribute__oxtype.value %}
-            
+
             {% if sType == 'COLOR' %}
                 {% if oAttr.oxattribute__oxcolor.value %}
                      <span style="background-color: {{ oAttr.oxattribute__oxcolor.value }}; width: 20px; height: 20px; display: inline-block; border: 1px solid #ccc; vertical-align: middle; margin-right: 5px; border-radius: 3px;" title="{{ oAttr.value }}"></span>
                 {% endif %}
                 {{ oAttr.value }}
-                
+
             {% elseif sType == 'IMAGE' %}
                 {% if oAttr.oxattribute__oximage.value %}
-                    <img src="{{ oViewConf.getModuleUrl('advanced_attributes', 'out/img/') }}{{ oAttr.oxattribute__oximage.value }}" 
-                         style="max-height: 40px; vertical-align: middle; margin-right: 5px; border: 1px solid #eee; padding: 2px;" 
+                    <img src="{{ oViewConf.getShopUrl() }}out/pictures/master/attributes/{{ oAttr.oxattribute__oximage.value }}"
+                         style="max-height: 40px; vertical-align: middle; margin-right: 5px; border: 1px solid #eee; padding: 2px;"
                          alt="{{ oAttr.value }}"
                          onerror="this.style.display='none'">
-                     {# Fallback to master/attributes if above fails or depends on setup #}
                 {% endif %}
                 {{ oAttr.value }}
-                
+
+            {% elseif sType == 'VISUAL_SWATCH' %}
+                {% if oAttr.oxattribute__oxcolor.value %}
+                    <span style="background-color: {{ oAttr.oxattribute__oxcolor.value }}; width: 20px; height: 20px; display: inline-block; border: 1px solid #ccc; vertical-align: middle; margin-right: 5px; border-radius: 3px;" title="{{ oAttr.value }}"></span>
+                {% endif %}
+                {% if oAttr.oxattribute__oximage.value %}
+                    <img src="{{ oViewConf.getShopUrl() }}out/pictures/master/attributes/{{ oAttr.oxattribute__oximage.value }}"
+                         style="max-height: 40px; vertical-align: middle; margin-right: 5px; border: 1px solid #eee; padding: 2px;"
+                         alt="{{ oAttr.value }}"
+                         onerror="this.style.display='none'">
+                {% endif %}
+                {{ oAttr.value }}
+
             {% elseif sType == 'BOOL' %}
                 {% if oAttr.value == '1' or oAttr.value == 'true' or oAttr.value == 'on' %}
                     <i class="fa fa-check text-success" aria-hidden="true"></i> {{ translate({ ident: "YES" }) }}
                 {% else %}
                     <i class="fa fa-times text-danger" aria-hidden="true"></i> {{ translate({ ident: "NO" }) }}
                 {% endif %}
-                
+
             {% elseif sType == 'DATE' %}
                 {{ oAttr.value|date("d.m.Y") }}
-                
-            {% elseif sType == 'MULTISELECT' %}
+
+            {% elseif sType == 'DATETIME' %}
+                {{ oAttr.value|date("d.m.Y H:i") }}
+
+            {% elseif sType == 'PRICE' %}
+                {{ oAttr.value|number_format(2, ',', '.') }} {{ oView.getActiveCurrency().sign }}
+
+            {% elseif sType == 'MULTISELECT' or sType == 'TEXT_SWATCH' %}
                 {% if oAttr.aValues %}
                     {% for val in oAttr.aValues %}
-                        <span class="badge badge-secondary" style="margin-right: 3px; border: 1px solid #ddd; background: #f5f5f5; color: #333; padding: 3px 8px;">{{ val }}</span>
+                        <span class="badge" style="margin-right: 3px; border: 1px solid #ddd; background: #f5f5f5; color: #333; padding: 3px 8px; border-radius: 2px;">{{ val }}</span>
                     {% endfor %}
                 {% else %}
                     {{ oAttr.value|replace({',': ', '}) }}
                 {% endif %}
-                
+
             {% else %}
-                {# Default / Custom Types #}
                 {{ oAttr.value }}
             {% endif %}
 
